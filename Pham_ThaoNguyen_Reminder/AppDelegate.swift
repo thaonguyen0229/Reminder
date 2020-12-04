@@ -1,12 +1,6 @@
-//
-//  AppDelegate.swift
-//  Pham_ThaoNguyen_Reminder
-//
-//  Created by Nguyễn  Yến on 2019-04-20.
-//  Copyright © 2019 Nyen. All rights reserved.
-//
 
 import UIKit
+import UserNotifications
 
 @UIApplicationMain
 class AppDelegate: UIResponder, UIApplicationDelegate {
@@ -16,6 +10,14 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
 
     func application(_ application: UIApplication, didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey: Any]?) -> Bool {
         // Override point for customization after application launch.
+        
+        //load the saved list of reminder if the user already created a list pf reminder
+        Categories.loadFromFile()
+        
+        //ask for permission to send notification
+        let center = UNUserNotificationCenter.current()
+        center.requestAuthorization(options: [.alert,.sound,.badge]) {(granted, error) in}
+        
         return true
     }
 
@@ -27,6 +29,13 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
     func applicationDidEnterBackground(_ application: UIApplication) {
         // Use this method to release shared resources, save user data, invalidate timers, and store enough application state information to restore your application to its current state in case it is terminated later.
         // If your application supports background execution, this method is called instead of applicationWillTerminate: when the user quits.
+        
+        //save data and send notification when user quits the app
+        Categories.saveToFile(array: arrayOfCategories)
+        for index in arrayOfCategories {
+            sendNotification(category: index)
+        }
+        print("did create notification")
     }
 
     func applicationWillEnterForeground(_ application: UIApplication) {
@@ -39,6 +48,13 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
 
     func applicationWillTerminate(_ application: UIApplication) {
         // Called when the application is about to terminate. Save data if appropriate. See also applicationDidEnterBackground:.
+        
+        //save data and send notification when user quits the app
+        Categories.loadFromFile()
+        for index in arrayOfCategories {
+            sendNotification(category: index)
+        }
+        print("did create notification")
     }
 
 
